@@ -1,34 +1,30 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu VDO.Ninja</title>
-    <link rel="stylesheet" href="style.css">
-    
+    <title>RECEPTOR - PC</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        body { background: #111; color: white; font-family: sans-serif; text-align: center; }
+        video { width: 80%; border: 2px solid #e74c3c; border-radius: 10px; background: #000; }
+        .id-box { font-size: 24px; color: #f1c40f; margin: 20px; padding: 10px; border: 1px dashed; }
+    </style>
 </head>
 <body>
-    <h1>Câmera ao Vivo - WebRTC</h1>
+    <h1>TELA DE RECEPÇÃO (OBS)</h1>
+    <div class="id-box">ID DO PC: <span id="meu-id">...</span></div>
+    <video id="video-remoto" autoplay playsinline></video>
 
-    <div class="controles">
-        <p><strong>SEU ID NESTE APARELHO:</strong> <span id="meu-id" style="color: #f1c40f;">Gerando...</span></p>
-        <p>Para conectar, copie o ID do outro aparelho e cole abaixo:</p>
-        <input type="text" id="id-destino" placeholder="Cole o ID do iPhone aqui">
-        <button id="btn-conectar">Conectar Câmera</button>
-    </div>
+    <script>
+        const peer = new Peer();
+        peer.on('open', id => document.getElementById('meu-id').innerText = id);
 
-    <div class="videos">
-        <div class="video-box">
-            <h3>Sua Câmera (Local)</h3>
-            <video id="video-local" autoplay muted playsinline></video>
-        </div>
-        <div class="video-box">
-            <h3>Câmera Recebida (Remota)</h3>
-            <video id="video-remoto" autoplay playsinline></video>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+        // Quando o iPhone ligar para este PC...
+        peer.on('call', call => {
+            call.answer(); // Atende sem enviar vídeo de volta
+            call.on('stream', remoteStream => {
+                document.getElementById('video-remoto').srcObject = remoteStream;
+            });
+        });
+    </script>
 </body>
 </html>
