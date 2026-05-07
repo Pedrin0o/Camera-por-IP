@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu VDO.Ninja</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+</head>
+<body>
+    <h1>Câmera ao Vivo - WebRTC</h1>
+
+    <div class="controles">
+        <p><strong>SEU ID NESTE APARELHO:</strong> <span id="meu-id" style="color: #f1c40f;">Gerando...</span></p>
+        <p>Para conectar, copie o ID do outro aparelho e cole abaixo:</p>
+        <input type="text" id="id-destino" placeholder="Cole o ID do iPhone aqui">
+        <button id="btn-conectar">Conectar Câmera</button>
+    </div>
+
+    <div class="videos">
+        <div class="video-box">
+            <h3>Sua Câmera (Local)</h3>
+            <video id="video-local" autoplay muted playsinline></video>
+        </div>
+        <div class="video-box">
+            <h3>Câmera Recebida (Remota)</h3>
+            <video id="video-remoto" autoplay playsinline></video>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
