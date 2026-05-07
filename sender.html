@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENDER - iPHONE</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; }
+        video { width: 100%; max-width: 300px; transform: scaleX(-1); border-radius: 10px; }
+        input { padding: 10px; font-size: 16px; width: 80%; margin: 10px 0; }
+        button { padding: 15px; background: #27ae60; color: white; border: none; border-radius: 5px; width: 80%; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>TRANSMISSOR IPHONE</h1>
+    <video id="video-local" autoplay muted playsinline></video><br>
+    <input type="text" id="id-pc" placeholder="Digite o ID do PC aqui">
+    <button onclick="comecarTransmissao()">INICIAR TRANSMISSÃO</button>
+
+    <script>
+        const peer = new Peer();
+        let localStream;
+
+        // Ativa a câmera do iPhone imediatamente
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(stream => {
+                localStream = stream;
+                document.getElementById('video-local').srcObject = stream;
+            });
+
+        function comecarTransmissao() {
+            const idPC = document.getElementById('id-pc').value;
+            if (!idPC) return alert("Digite o ID que aparece no PC!");
+            
+            // O iPhone liga para o PC enviando o vídeo
+            const call = peer.call(idPC, localStream);
+            alert("Transmitindo para: " + idPC);
+        }
+    </script>
+</body>
+</html>
