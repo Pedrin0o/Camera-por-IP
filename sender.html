@@ -5,37 +5,89 @@
     <title>SENDER - iPHONE</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; }
-        video { width: 100%; max-width: 300px; transform: scaleX(-1); border-radius: 10px; }
-        input { padding: 10px; font-size: 16px; width: 80%; margin: 10px 0; }
-        button { padding: 15px; background: #27ae60; color: white; border: none; border-radius: 5px; width: 80%; font-weight: bold; }
+        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: #1e1e24; color: white; }
+        video { width: 100%; max-width: 300px; border-radius: 10px; background: #000; border: 2px solid #333; margin-bottom: 15px; }
+        input { padding: 10px; font-size: 16px; width: 80%; margin: 10px 0; border-radius: 5px; border: none; }
+        button { padding: 15px; color: white; border: none; border-radius: 5px; width: 80%; font-weight: bold; margin-bottom: 10px; cursor: pointer; }
+        
+        .btn-camera { background: #3498db; }
+        .btn-transmitir { background: #27ae60; }
+        
+        /* Classe para espelhar apenas a câmera frontal */
+        .espelhado { transform: scaleX(-1); }
     </style>
 </head>
 <body>
     <h1>TRANSMISSOR IPHONE</h1>
     <video id="video-local" autoplay muted playsinline></video><br>
+    
+    <button class="btn-camera" onclick="alternarCamera()">🔄 VIRAR CÂMERA</button><br>
+    
     <input type="text" id="id-pc" placeholder="Digite o ID do PC aqui">
-    <button onclick="comecarTransmissao()">INICIAR TRANSMISSÃO</button>
+    <button class="btn-transmitir" onclick="comecarTransmissao()">INICIAR TRANSMISSÃO</button>
 
     <script>
         const peer = new Peer();
         let localStream;
+        let currentCall;
+        let cameraAtual = "environment"; // Inicia com a câmera traseira (environment)
 
-        // Ativa a câmera do iPhone imediatamente
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            .then(stream => {
-                localStream = stream;
-                document.getElementById('video-local').srcObject = stream;
-            });
+        async function iniciarCamera() {
+            // Se já houver uma câmera aberta, desliga para abrir a nova
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+
+            // Pede a câmera selecionada e força a resolução ideal para 4K
+            const constraints = {
+                audio: true,
+                video: {
+                    facingMode: cameraAtual,
+                    width: { ideal: 3840 }, 
+                    height: { ideal: 2160 }
+                }
+            };
+
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                const videoElement = document.getElementById('video-local');
+                videoElement.srcObject = localStream;
+
+                // Só aplica o efeito espelho se for a câmera frontal
+                if (cameraAtual === "user") {
+                    videoElement.classList.add("espelhado");
+                } else {
+                    videoElement.classList.remove("espelhado");
+                }
+
+                // Se já estiver transmitindo, troca a imagem em tempo real sem derrubar a call
+                if (currentCall) {
+                    const videoTrack = localStream.getVideoTracks();
+                    const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
+                    if (sender) sender.replaceTrack(videoTrack);
+                }
+
+            } catch (err) {
+                alert("Erro ao acessar câmera: Verifique as permissões. " + err.message);
+            }
+        }
+
+        function alternarCamera() {
+            cameraAtual = cameraAtual === "environment" ? "user" : "environment";
+            iniciarCamera();
+        }
 
         function comecarTransmissao() {
             const idPC = document.getElementById('id-pc').value;
             if (!idPC) return alert("Digite o ID que aparece no PC!");
             
-            // O iPhone liga para o PC enviando o vídeo
-            const call = peer.call(idPC, localStream);
+            // O iPhone liga para o PC enviando o vídeo em alta qualidade
+            currentCall = peer.call(idPC, localStream);
             alert("Transmitindo para: " + idPC);
         }
+
+        // Inicia a câmera assim que a página abre
+        iniciarCamera();
     </script>
 </body>
 </html>

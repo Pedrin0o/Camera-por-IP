@@ -31,6 +31,21 @@
 
         .id-box { font-size: 28px; color: #f1c40f; margin-top: 15px; font-weight: bold; }
         
+        .btn-nav {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-nav:hover { background: #2980b9; }
+
         /* O object-fit: contain garante que o vídeo encaixe na tela sem esticar a imagem */
         video { 
             width: 100vw; 
@@ -45,6 +60,8 @@
         <h1>TELA DE RECEPÇÃO (OBS)</h1>
         <div class="id-box">ID DO PC:<br><span id="meu-id">Gerando...</span></div>
         <p style="color: #aaa; margin-top: 15px;">(Este quadro sumirá automaticamente quando a transmissão iniciar)</p>
+        
+        <a href="sender.html" class="btn-nav">📱 IR PARA O SENDER</a>
     </div>
 
     <video id="video-remoto" autoplay playsinline></video>
