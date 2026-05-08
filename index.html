@@ -1,28 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>RECEPTOR - PC</title>
+    <title>RECEPTOR - PC (OBS)</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        body { background: #111; color: white; font-family: sans-serif; text-align: center; }
-        video { width: 80%; border: 2px solid #e74c3c; border-radius: 10px; background: #000; }
-        .id-box { font-size: 24px; color: #f1c40f; margin: 20px; padding: 10px; border: 1px dashed; }
+        /* Fundo totalmente preto para não interferir no OBS */
+        body { 
+            background: #000; 
+            color: white; 
+            font-family: sans-serif; 
+            margin: 0; 
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #info-box {
+            position: absolute;
+            z-index: 10;
+            text-align: center;
+            background: rgba(30, 30, 36, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #444;
+        }
+
+        .id-box { font-size: 28px; color: #f1c40f; margin-top: 15px; font-weight: bold; }
+        
+        /* O object-fit: contain garante que o vídeo encaixe na tela sem esticar a imagem */
+        video { 
+            width: 100vw; 
+            height: 100vh; 
+            object-fit: contain; 
+            background: #000; 
+        }
     </style>
 </head>
 <body>
-    <h1>TELA DE RECEPÇÃO (OBS)</h1>
-    <div class="id-box">ID DO PC: <span id="meu-id">...</span></div>
+    <div id="info-box">
+        <h1>TELA DE RECEPÇÃO (OBS)</h1>
+        <div class="id-box">ID DO PC:<br><span id="meu-id">Gerando...</span></div>
+        <p style="color: #aaa; margin-top: 15px;">(Este quadro sumirá automaticamente quando a transmissão iniciar)</p>
+    </div>
+
     <video id="video-remoto" autoplay playsinline></video>
 
     <script>
         const peer = new Peer();
         peer.on('open', id => document.getElementById('meu-id').innerText = id);
 
-        // Quando o iPhone ligar para este PC...
         peer.on('call', call => {
-            call.answer(); // Atende sem enviar vídeo de volta
+            call.answer(); // Atende a ligação
+            
             call.on('stream', remoteStream => {
+                // Joga o vídeo na tela
                 document.getElementById('video-remoto').srcObject = remoteStream;
+                
+                // Esconde a interface de ID para a tela do PC ficar limpa para o OBS
+                document.getElementById('info-box').style.display = 'none';
             });
         });
     </script>
